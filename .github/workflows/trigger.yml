@@ -1,0 +1,27 @@
+name: Trigger Test Repository Workflow
+
+on:
+  push:
+    branches: [ main, prod, qa ]
+  pull_request:
+    branches: [ main, prod, qa ]
+
+jobs:
+  trigger-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Trigger Test Repository Workflow
+      run: |
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.TOKEN_PERSONAL }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "event_type": "run-tests",
+                "client_payload": {
+                  "pr_url": "${{ github.event.pull_request.html_url }}",
+                  "repository": "${{ github.repository }}",
+                  "pr_title": "${{ github.event.pull_request.title }}"
+                }
+              }' \
+          https://api.github.com/repos/NicoARF/playwright_ts/dispatches
