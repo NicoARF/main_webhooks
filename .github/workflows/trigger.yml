@@ -11,26 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Determine Event Context
-      id: context
-      run: |
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
-          echo "name=event_name::Pull Request: ${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
-        elif [ "${{ github.event_name }}" = "push" ]; then
-          echo "name=event_name::Push to branch ${{ github.event.head_commit.message }}" >> $GITHUB_OUTPUT
-        fi
-
     - name: Trigger Test Repository Workflow
       run: |
+        if [ "${{ github.event_name }}" == "push" ]; then
+          TITLE="${{ github.event.head_commit.message }}"
+        else
+          TITLE="${{ github.event.pull_request.title }}"
+        fi
+        
         curl -X POST \
           -H "Authorization: Bearer ${{ secrets.TOKEN_PERSONAL }}" \
           -H "Content-Type: application/json" \
           -d '{
                 "event_type": "run-tests",
                 "client_payload": {
-                  "event_name": "${{ steps.context.outputs.event_name }}",
-                  "repository": "${{ github.repository }}",
-                  "event_details": "${{ github.event_name }}"
+                  "event_name": "${{ github.event_name }} en ${{ github.ref_name }}. Titulo: '"$TITLE"'",
+                  "repository": "${{ github.repository }}"
                 }
               }' \
           https://api.github.com/repos/NicoARF/playwright_ts/dispatches
