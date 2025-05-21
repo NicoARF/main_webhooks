@@ -2,9 +2,9 @@ name: Trigger Test Repository Workflow
 
 on:
   push:
-    branches: [ main, prod, qa ]
+    branches: [ main, prod, qa, prueba ]
   pull_request:
-    branches: [ main, prod, qa ]
+    branches: [ main, prod, qa, prueba ]
 
 jobs:
   trigger-test:
